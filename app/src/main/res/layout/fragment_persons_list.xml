@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.PersonsListFragment">
+
+    <Toolbar
+        android:id="@+id/peopleTb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:title="People"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/peopleTb"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/filterCountry">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/personRvAdapter"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/item_persons"/>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <Button
+        android:id="@+id/filterCountry"
+        android:layout_width="40dp"
+        android:layout_height="32dp"
+        android:layout_margin="24dp"
+        android:background="@drawable/ic_double_arrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <Button
+        android:id="@+id/filterCity"
+        android:layout_width="40dp"
+        android:layout_height="32dp"
+        android:background="@drawable/ic_sort"
+        android:layout_marginStart="24dp"
+        app:layout_constraintStart_toEndOf="@+id/filterCountry"
+        app:layout_constraintTop_toTopOf="@+id/filterCountry"
+        app:layout_constraintBottom_toBottomOf="@+id/filterCountry"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
