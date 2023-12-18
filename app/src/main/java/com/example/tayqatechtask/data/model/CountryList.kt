@@ -1,5 +1,6 @@
 package com.example.tayqatechtask.data.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
@@ -13,6 +14,5 @@ data class CountryList(
 
     val countryList: List<Country> = emptyList()
 ) {
-    // Default empty constructor for Room
     constructor() : this(0, emptyList())
 }

@@ -1,5 +1,6 @@
 package com.example.tayqatechtask.repository
 
+import android.util.Log
 import com.example.tayqatechtask.data.local.PersonDao
 import com.example.tayqatechtask.data.model.Country
 import com.example.tayqatechtask.data.model.CountryList
@@ -13,9 +14,16 @@ class AppRepository @Inject constructor(
     private val personDao: PersonDao,
 ) {
 
-    suspend fun getPeopleFromSelectedCountries(selectedCountries: Set<Country>): List<People> {
+    suspend fun filterPeopleByCountries(selectedCountries: List<Country>): List<People> {
+        Log.d("Repository", "Filtering people by countries: $selectedCountries")
+
         val countryIds = selectedCountries.map { it.countryId }
-        return personDao.getPeopleByCountryIds(countryIds)
+
+        val filteredPeople = personDao.filterPeopleByCountries(countryIds)
+
+        Log.d("Repository", "Filtered people from DAO: $filteredPeople")
+
+        return filteredPeople
     }
 
     suspend fun refreshCountries(): CountryList {
@@ -33,12 +41,11 @@ class AppRepository @Inject constructor(
         return countryListResult?.countryList.orEmpty()
     }
 
-    suspend fun getCountries(): CountryList {
-        return tayqaTechApi.getData()
+    suspend fun updateCountriesToLocal(countries: CountryList) {
+        personDao.insertAllCountries(countries)
     }
 
-    suspend fun updateCountriesToLocal(countries: CountryList) {
-        // Update your local database with the new data
-        personDao.insertAllCountries(countries)
+    suspend fun getCountriesForFilter(): CountryList {
+        return tayqaTechApi.getData()
     }
 }

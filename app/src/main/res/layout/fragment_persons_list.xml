@@ -27,7 +27,7 @@
         app:layout_constraintBottom_toTopOf="@+id/filterCountry">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/personRvAdapter"
+            android:id="@+id/personRv"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:layout_width="match_parent"

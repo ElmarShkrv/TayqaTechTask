@@ -10,10 +10,10 @@ import com.example.tayqatechtask.R
 import com.example.tayqatechtask.data.model.Country
 
 class CountryFilterAdapter(
-    private val countryList: List<Country>,
-    private val onItemClickListener: (Set<Country>) -> Unit
+    private val onItemClickListener: (Country) -> Unit,
 ) : RecyclerView.Adapter<CountryFilterAdapter.ViewHolder>() {
 
+    private val countryList: MutableList<Country> = mutableListOf()
     private val selectedItems = HashSet<Country>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,21 +32,21 @@ class CountryFilterAdapter(
                 selectedItems.add(country)
             }
             notifyItemChanged(position)
-            onItemClickListener.invoke(selectedItems)
+            onItemClickListener.invoke(country)
         }
-
-//        holder.itemView.setOnClickListener {
-//            if (selectedItems.contains(country)) {
-//                selectedItems.remove(country)
-//            } else {
-//                selectedItems.add(country)
-//            }
-//            notifyItemChanged(position)
-//            onItemClickListener.invoke(country)
-//        }
     }
 
     override fun getItemCount(): Int = countryList.size
+
+    fun updateCountryList(newCountryList: List<Country>) {
+        countryList.clear()
+        countryList.addAll(newCountryList)
+        notifyDataSetChanged()
+    }
+
+    fun getSelectedItems(): Set<Country> {
+        return selectedItems
+    }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(country: Country, isSelected: Boolean) {
@@ -55,9 +55,4 @@ class CountryFilterAdapter(
                 if (isSelected) View.VISIBLE else View.GONE
         }
     }
-
-    fun getSelectedItems(): Set<Country> {
-        return selectedItems
-    }
-
 }

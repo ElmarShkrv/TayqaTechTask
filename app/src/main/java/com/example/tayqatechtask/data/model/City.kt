@@ -11,7 +11,7 @@ data class City(
     val name: String,
     val countryId: Int,
 
-    @ColumnInfo(name = "peopleList")
+//    @ColumnInfo(name = "peopleList")
     val peopleList: List<People>,
 ) {
     constructor() : this(0, "", 0, emptyList())

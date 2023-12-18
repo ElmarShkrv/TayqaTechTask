@@ -1,5 +1,6 @@
 package com.example.tayqatechtask.ui
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import com.example.tayqatechtask.data.model.Country
 import com.example.tayqatechtask.data.model.People
 import com.example.tayqatechtask.repository.AppRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,25 +24,45 @@ class PersonListViewModel @Inject constructor(
     private val _countriesForFilter = MutableLiveData<List<Country>>()
     val countriesForFilter: LiveData<List<Country>> get() = _countriesForFilter
 
-    private val _selectedCountries = MutableLiveData<Set<Country>>().apply { value = emptySet() }
-    val selectedCountries: LiveData<Set<Country>> get() = _selectedCountries
+    private val _filteredPersons = MutableLiveData<List<People>>()
+    val filteredPersons: LiveData<List<People>> get() = _filteredPersons
 
-    private val _filteredPeople = MutableLiveData<List<People>>()
-    val filteredPeople: LiveData<List<People>> get() = _filteredPeople
+    private val selectedCountries = MutableLiveData<Set<Country>>(emptySet())
 
-
-    fun setFilteredPeople(people: List<People>) {
-        _filteredPeople.value = people
+    init {
+        // Observe changes in selected countries and trigger filtering
+        selectedCountries.observeForever { selected ->
+            viewModelScope.launch {
+                // Ensure selectedCountries is not empty before filtering
+                if (selected.isNotEmpty()) {
+                    val filteredPeople = repository.filterPeopleByCountries(selected.toList())
+                    Log.d("ViewModel", "selected to list: $selected")
+                    _filteredPersons.value = filteredPeople
+                } else {
+                    // Handle the case when no countries are selected (show all)
+                    _filteredPersons.value = _countries.value?.flatMap { it.cityList.flatMap { it.peopleList } }
+                }
+            }
+        }
     }
 
-    fun refreshData() {
-        viewModelScope.launch {
-            val refreshedData = repository.refreshCountries()
-            // Update local database with fresh data
-            repository.updateCountriesToLocal(refreshedData)
-            // Update UI with the refreshed data
-            _countries.value = refreshedData.countryList
-        }
+//    init {
+//        // Observe changes in selected countries and trigger filtering
+//        selectedCountries.observeForever { selected ->
+//            viewModelScope.launch(Dispatchers.Main) {
+//                // Ensure selectedCountries is not empty before filtering
+//                if (selected.isNotEmpty()) {
+//                    val filteredPeople = repository.filterPeopleByCountries(selected.toList())
+//                    Log.d("ViewModel", "Filtered people: $filteredPeople")
+//                    _filteredPersons.value = filteredPeople
+//                    Log.d("ViewModel", "Filtered people in ViewModel: $filteredPeople")
+//                }
+//            }
+//        }
+//    }
+
+    fun updateSelectedCountries(selectedCountries: Set<Country>) {
+        this.selectedCountries.value = selectedCountries
     }
 
     fun getCountries() {
@@ -48,26 +70,24 @@ class PersonListViewModel @Inject constructor(
             val countryListResult = repository.getCountriesFromLocal()
 
             if (countryListResult.isNotEmpty()) {
-                // Data is available in the local database, show it
                 _countries.value = countryListResult
             } else {
-                // Local database is empty or data is not available, fetch from the API
                 refreshData()
             }
         }
     }
 
-    fun getCountriesForFilter() {
+    fun refreshData() {
         viewModelScope.launch {
-            _countriesForFilter.value = repository.getCountries().countryList
+            val refreshedData = repository.refreshCountries()
+            repository.updateCountriesToLocal(refreshedData)
+            _countries.value = refreshedData.countryList
         }
     }
 
-    fun updateSelectedCountries(selectedCountries: Set<Country>) {
-        _selectedCountries.value = selectedCountries
-    }
-
-    suspend fun getPeopleFromSelectedCountries(selectedCountries: Set<Country>): List<People> {
-        return repository.getPeopleFromSelectedCountries(selectedCountries)
+    fun getCountriesForFilter() {
+        viewModelScope.launch {
+            _countriesForFilter.value = repository.getCountriesForFilter().countryList
+        }
     }
 }
