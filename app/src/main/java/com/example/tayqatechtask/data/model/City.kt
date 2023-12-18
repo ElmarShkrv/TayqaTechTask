@@ -1,6 +1,6 @@
 package com.example.tayqatechtask.data.model
 
-import androidx.room.ColumnInfo
+
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -9,10 +9,8 @@ data class City(
     @PrimaryKey
     val cityId: Int,
     val name: String,
-    val countryId: Int,
 
-//    @ColumnInfo(name = "peopleList")
     val peopleList: List<People>,
 ) {
-    constructor() : this(0, "", 0, emptyList())
+    constructor() : this(0,  "",  emptyList())
 }

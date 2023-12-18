@@ -30,36 +30,19 @@ class PersonListViewModel @Inject constructor(
     private val selectedCountries = MutableLiveData<Set<Country>>(emptySet())
 
     init {
-        // Observe changes in selected countries and trigger filtering
         selectedCountries.observeForever { selected ->
             viewModelScope.launch {
-                // Ensure selectedCountries is not empty before filtering
                 if (selected.isNotEmpty()) {
-                    val filteredPeople = repository.filterPeopleByCountries(selected.toList())
+                    val countryIds = selected.map { it.countryId }
+                    val filteredPeople = repository.filterPeopleByCountries(countryIds)
                     Log.d("ViewModel", "selected to list: $selected")
                     _filteredPersons.value = filteredPeople
                 } else {
-                    // Handle the case when no countries are selected (show all)
                     _filteredPersons.value = _countries.value?.flatMap { it.cityList.flatMap { it.peopleList } }
                 }
             }
         }
     }
-
-//    init {
-//        // Observe changes in selected countries and trigger filtering
-//        selectedCountries.observeForever { selected ->
-//            viewModelScope.launch(Dispatchers.Main) {
-//                // Ensure selectedCountries is not empty before filtering
-//                if (selected.isNotEmpty()) {
-//                    val filteredPeople = repository.filterPeopleByCountries(selected.toList())
-//                    Log.d("ViewModel", "Filtered people: $filteredPeople")
-//                    _filteredPersons.value = filteredPeople
-//                    Log.d("ViewModel", "Filtered people in ViewModel: $filteredPeople")
-//                }
-//            }
-//        }
-//    }
 
     fun updateSelectedCountries(selectedCountries: Set<Country>) {
         this.selectedCountries.value = selectedCountries

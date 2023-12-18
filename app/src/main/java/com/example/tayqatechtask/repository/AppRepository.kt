@@ -1,6 +1,5 @@
 package com.example.tayqatechtask.repository
 
-import android.util.Log
 import com.example.tayqatechtask.data.local.PersonDao
 import com.example.tayqatechtask.data.model.Country
 import com.example.tayqatechtask.data.model.CountryList
@@ -14,14 +13,13 @@ class AppRepository @Inject constructor(
     private val personDao: PersonDao,
 ) {
 
-    suspend fun filterPeopleByCountries(selectedCountries: List<Country>): List<People> {
-        Log.d("Repository", "Filtering people by countries: $selectedCountries")
+    suspend fun filterPeopleByCountries(countryIds: List<Int>): List<People> {
+        val countryList: CountryList = personDao.getAllCountries()
 
-        val countryIds = selectedCountries.map { it.countryId }
-
-        val filteredPeople = personDao.filterPeopleByCountries(countryIds)
-
-        Log.d("Repository", "Filtered people from DAO: $filteredPeople")
+        val filteredPeople = countryList.countryList
+            .filter { it.countryId in countryIds }
+            .flatMap { it.cityList }
+            .flatMap { it.peopleList }
 
         return filteredPeople
     }

@@ -11,7 +11,7 @@ import com.example.tayqatechtask.data.model.People
 import com.example.tayqatechtask.util.Converters
 
 @Database(
-    entities = [CountryList::class, City::class, Country::class, CityPeopleCrossRef::class, People::class],
+    entities = [CountryList::class, City::class, Country::class, People::class],
     version = 4
 )
 @TypeConverters(Converters::class)

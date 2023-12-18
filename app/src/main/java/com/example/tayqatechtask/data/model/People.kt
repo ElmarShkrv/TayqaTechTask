@@ -9,6 +9,5 @@ data class People(
     @PrimaryKey
     val humanId: Int,
     val name: String,
-    val surname: String,
-    val cityId: Int
+    val surname: String
 )
