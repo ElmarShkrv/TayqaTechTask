@@ -1,4 +1,4 @@
-package com.example.tayqatechtask.ui
+package com.example.tayqatechtask.ui.fragment
 
 import android.os.Bundle
 import android.util.Log
@@ -11,13 +11,16 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.tayqatechtask.R
+import com.example.tayqatechtask.adapters.CityFilterAdapter
 import com.example.tayqatechtask.adapters.CountryFilterAdapter
 import com.example.tayqatechtask.adapters.PersonAdapter
+import com.example.tayqatechtask.data.model.City
 import com.example.tayqatechtask.data.model.Country
 import com.example.tayqatechtask.data.model.People
 import com.example.tayqatechtask.databinding.FragmentFilterCitiesBinding
 import com.example.tayqatechtask.databinding.FragmentFilterCountriesBinding
 import com.example.tayqatechtask.databinding.FragmentPersonsListBinding
+import com.example.tayqatechtask.viewmodel.PersonListViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,6 +30,7 @@ class PersonsListFragment : Fragment() {
     private lateinit var binding: FragmentPersonsListBinding
     private val viewModel: PersonListViewModel by viewModels()
     private val selectedItems = HashSet<Country>()
+    private val selectedItemsFromCites = HashSet<City>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,9 +61,7 @@ class PersonsListFragment : Fragment() {
             viewModel.refreshData()
         }
 
-        // Observe the filteredPersons LiveData here
         viewModel.filteredPersons.observe(viewLifecycleOwner) { filteredPeople ->
-            // Update the existing adapter with the new list of filtered people
             Log.d("Fragment", "Filtered people received: $filteredPeople")
             personAdapter.submitList(filteredPeople)
         }
@@ -90,6 +92,7 @@ class PersonsListFragment : Fragment() {
             val selectedCountries =
                 (bindingForCountriesFilter.filterCountryRv.adapter as CountryFilterAdapter).getSelectedItems()
                     .toSet()
+            viewModel.updateSelectedCountriesForCitesFilter(selectedCountries)
             Log.d("Fragment", "selectedCountries: $selectedCountries")
             viewModel.updateSelectedCountries(selectedCountries)
             dialogForCountries.dismiss()
@@ -116,6 +119,29 @@ class PersonsListFragment : Fragment() {
         val bindingForCitiesFilter = FragmentFilterCitiesBinding.inflate(inflater)
         val dialogForCities = BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme)
         dialogForCities.setContentView(bindingForCitiesFilter.root)
+        initCitiesFilter(bindingForCitiesFilter)
+
+        bindingForCitiesFilter.filterApplyBtn.setOnClickListener {
+            val selectedCities =
+                (bindingForCitiesFilter.filterCityRv.adapter as CityFilterAdapter).getSelectedItems()
+                    .toSet()
+            Log.d("Fragment", "selectedCountries: $selectedCities")
+            viewModel.updateSelectedCities(selectedCities)
+            dialogForCities.dismiss()
+        }
+
         dialogForCities.show()
+    }
+
+    private fun initCitiesFilter(binding: FragmentFilterCitiesBinding) {
+        val filterCityRecyclerView: RecyclerView = binding.filterCityRv
+        val adapter = CityFilterAdapter { selectedCities ->
+            selectedItemsFromCites.add(selectedCities)
+        }
+        filterCityRecyclerView.adapter = adapter
+
+        viewModel.citiesForFilter.observe(viewLifecycleOwner) { citiesForFilter ->
+            adapter.updateCityList(citiesForFilter)
+        }
     }
 }

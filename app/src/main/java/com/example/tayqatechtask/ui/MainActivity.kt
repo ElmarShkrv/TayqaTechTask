@@ -1,9 +1,10 @@
-package com.example.tayqatechtask
+package com.example.tayqatechtask.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.example.tayqatechtask.R
 import com.example.tayqatechtask.databinding.ActivityMainBinding
-import com.example.tayqatechtask.ui.PersonsListFragment
+import com.example.tayqatechtask.ui.fragment.PersonsListFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -18,8 +19,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         supportFragmentManager.beginTransaction()
-            .add(R.id.fragmentContainerView, PersonsListFragment())
-            .commit()
+            .add(R.id.fragmentContainerView, PersonsListFragment()).commit()
 
     }
 }
